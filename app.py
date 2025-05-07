@@ -1,3 +1,6 @@
+import os
+os.system("pip install 'git+https://github.com/facebookresearch/detectron2.git'")
+
 import torch
 import cv2
 import numpy as np
