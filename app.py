@@ -19,11 +19,11 @@ from huggingface_hub import hf_hub_download
 # --- Load Models from Hugging Face Hub ---
 
 # YOLOv8m
-yolo_path = hf_hub_download(repo_id="nikhilsunka/animal-detection-models", filename="best.pt")
+yolo_path = hf_hub_download(repo_id="NikhilSunka/animal-detection-models", filename="best.pt")
 yolo_model = YOLO(yolo_path)
 
 # Faster R-CNN
-fasterrcnn_path = hf_hub_download(repo_id="nikhilsunka/animal-detection-models", filename="model_final.pth")
+fasterrcnn_path = hf_hub_download(repo_id="NikhilSunka/animal-detection-models", filename="model_final.pth")
 
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"))
