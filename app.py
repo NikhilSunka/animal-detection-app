@@ -11,19 +11,26 @@ from detectron2 import model_zoo
 from detectron2.utils.visualizer import Visualizer
 from detectron2.data import MetadataCatalog
 
-# Load YOLOv8m Model
-yolo_model = YOLO("models/best.pt")
+from huggingface_hub import hf_hub_download
 
-# Load Faster R-CNN
+# --- Load Models from Hugging Face Hub ---
+
+# YOLOv8m
+yolo_path = hf_hub_download(repo_id="nikhilsunka/animal-detection-models", filename="best.pt")
+yolo_model = YOLO(yolo_path)
+
+# Faster R-CNN
+fasterrcnn_path = hf_hub_download(repo_id="nikhilsunka/animal-detection-models", filename="model_final.pth")
+
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"))
 cfg.MODEL.ROI_HEADS.NUM_CLASSES = 50
-cfg.MODEL.WEIGHTS = "models/model_final.pth"
+cfg.MODEL.WEIGHTS = fasterrcnn_path
 cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
 cfg.MODEL.DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 predictor = DefaultPredictor(cfg)
 
-# Define class names
+# --- Class Names ---
 classes = [
     "Bat_(Animal)", "Bear", "Bird", "Brown_bear", "Camel", "Cat", "Caterpillar", "Cattle", "Cheetah",
     "Chicken", "Crab", "Crocodile", "Deer", "Dog", "Duck", "Eagle", "Elephant", "Fish", "Fox", "Frog",
@@ -34,7 +41,7 @@ classes = [
 ]
 MetadataCatalog.get("custom_animals").thing_classes = classes
 
-# Inference
+# --- Inference Function ---
 def detect(model_choice, image):
     if model_choice == "YOLOv8m":
         results = yolo_model.predict(image)
@@ -48,7 +55,7 @@ def detect(model_choice, image):
         out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
         return Image.fromarray(out.get_image())
 
-# Gradio Interface
+# --- Gradio UI ---
 interface = gr.Interface(
     fn=detect,
     inputs=[
@@ -57,7 +64,7 @@ interface = gr.Interface(
     ],
     outputs="image",
     title="Animal Detection Comparison App",
-    description="Choose between YOLOv8m and Faster R-CNN to detect animals in uploaded images."
+    description="Upload an animal image and compare predictions between YOLOv8m and Faster R-CNN."
 )
 
 interface.launch()
