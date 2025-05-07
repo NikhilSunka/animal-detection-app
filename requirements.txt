@@ -5,3 +5,4 @@ detectron2
 opencv-python
 Pillow
 gradio
+huggingface_hub
